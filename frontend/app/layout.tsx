@@ -1,0 +1,32 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import { CreditProvider } from "@/context/CreditContext";
+import TopBar from "@/components/TopBar";
+import BottomDock from "@/components/BottomDock";
+import ClientLayout from "@/components/ClientLayout";
+import ParticleBackground from "@/components/ui/ParticleBackground";
+
+export const metadata: Metadata = {
+  title: "CreditMind — Autonomous Credit Intelligence",
+  description: "AI-native credit intelligence platform",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className="h-full">
+      <body className="h-full text-primary">
+        <CreditProvider>
+          <ParticleBackground />
+          <div
+            className="flex flex-col min-h-screen overflow-hidden"
+            style={{ position: "relative", zIndex: 1 }}
+          >
+            <TopBar />
+            <ClientLayout>{children}</ClientLayout>
+          </div>
+          <BottomDock />
+        </CreditProvider>
+      </body>
+    </html>
+  );
+}

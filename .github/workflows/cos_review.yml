@@ -1,0 +1,44 @@
+name: Chief of Staff Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [master]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  cos-review:
+    runs-on: ubuntu-latest
+    name: Chief of Staff — conflict & ownership check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Write changed files to temp file
+        run: git diff --name-only origin/master...HEAD > /tmp/changed_files.txt
+
+      - name: Run Chief of Staff
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          CHANGED_FILES_PATH: /tmp/changed_files.txt
+        run: python team/chief_of_staff.py
